@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kaster_02 - النجم</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-color: #7289da;
+            --bg-color: #0a0e29;
+            --text-color: white;
+            --container-bg: rgba(255, 255, 255, 0.1);
+            --container-border: rgba(255, 255, 255, 0.2);
+            --shadow-color: rgba(0, 0, 0, 0.4);
+        }
+
+        [data-theme="light"] {
+            --bg-color: #87CEEB;
+            --text-color: #2c3e50;
+            --container-bg: rgba(255, 255, 255, 0.9);
+            --container-border: rgba(255, 255, 255, 0.3);
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            background: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            transition: background 0.8s ease;
+        }
+
+        /* النجوم - تظهر فقط في Dark Mode */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 1;
+            transition: opacity 0.8s ease;
+        }
+
+        [data-theme="light"] .stars {
+            opacity: 0;
+        }
+
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        /* القمر */
+        .moon {
+            position: absolute;
+            top: 10%;
+            right: 10%;
+            width: 80px;
+            height: 80px;
+            background: #f5f5f5;
+            border-radius: 50%;
+            box-shadow: 0 0 40px rgba(255, 255, 255, 0.3);
+            z-index: 2;
+            transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="light"] .moon {
+            transform: translateY(150vh);
+            opacity: 0;
+        }
+
+        .moon::after {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 15px;
+            width: 20px;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 50%;
+        }
+
+        /* الشمس */
+        .sun {
+            position: absolute;
+            top: 10%;
+            right: 10%;
+            width: 80px;
+            height: 80px;
+            background: #FFD700;
+            border-radius: 50%;
+            box-shadow: 0 0 60px #FFA500;
+            z-index: 2;
+            transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(150vh);
+            opacity: 0;
+        }
+
+        [data-theme="light"] .sun {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* الشهب - تظهر فقط في Dark Mode */
+        .meteor {
+            position: absolute;
+            background: linear-gradient(90deg, white, transparent);
+            height: 2px;
+            animation: meteorFall 2s linear infinite;
+            z-index: 2;
+            opacity: 1;
+            transition: opacity 0.8s ease;
+        }
+
+        [data-theme="light"] .meteor {
+            opacity: 0;
+        }
+
+        /* الغيوم الجديدة - تظهر فقط في Light Mode */
+        .cloud {
+            position: absolute;
+            z-index: 2;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+
+        [data-theme="light"] .cloud {
+            opacity: 1;
+        }
+
+        .cloud::before {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 50%;
+            box-shadow: 
+                0 0 30px rgba(255, 255, 255, 0.8),
+                inset 0 0 20px rgba(255, 255, 255, 0.9);
+        }
+
+        /* غيوم بأحجام وأشكال مختلفة */
+        .cloud-1::before {
+            width: 120px;
+            height: 60px;
+            top: 0;
+            left: 0;
+            filter: blur(8px);
+        }
+
+        .cloud-1::after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.85);
+            width: 80px;
+            height: 50px;
+            border-radius: 50%;
+            top: -20px;
+            left: 20px;
+            filter: blur(6px);
+        }
+
+        .cloud-2::before {
+            width: 180px;
+            height: 70px;
+            top: 0;
+            left: 0;
+            filter: blur(10px);
+        }
+
+        .cloud-2::after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            width: 100px;
+            height: 60px;
+            border-radius: 50%;
+            top: -25px;
+            left: 40px;
+            filter: blur(8px);
+        }
+
+        .cloud-3::before {
+            width: 150px;
+            height: 65px;
+            top: 0;
+            left: 0;
+            filter: blur(9px);
+        }
+
+        .cloud-3::after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.9);
+            width: 90px;
+            height: 55px;
+            border-radius: 50%;
+            top: -22px;
+            left: 30px;
+            filter: blur(7px);
+        }
+
+        /* الكواكب - تظهر فقط في Dark Mode */
+        .planet {
+            position: absolute;
+            border-radius: 50%;
+            animation: planetGlow 4s ease-in-out infinite;
+            z-index: 2;
+            opacity: 1;
+            transition: opacity 0.8s ease;
+        }
+
+        [data-theme="light"] .planet {
+            opacity: 0;
+        }
+
+        /* المربع الرئيسي */
+        .profile-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 100;
+            width: 90%;
+            max-width: 450px;
+            background: var(--container-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 35px;
+            border: 1px solid var(--container-border);
+            box-shadow: 0 25px 50px var(--shadow-color);
+            text-align: center;
+            animation: containerGlow 3s ease-in-out infinite;
+            transition: all 0.8s ease;
+        }
+
+        /* تأثيرات حول المربع */
+        @keyframes containerGlow {
+            0%, 100% { box-shadow: 0 25px 50px var(--shadow-color), 0 0 0px rgba(114, 137, 218, 0.5); }
+            50% { box-shadow: 0 25px 50px var(--shadow-color), 0 0 30px rgba(114, 137, 218, 0.8); }
+        }
+
+        /* صورة البروفايل - دائرة الديسكورد */
+        .avatar-section {
+            margin-bottom: 20px;
+        }
+
+        .avatar {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            border: 3px solid var(--primary-color);
+            box-shadow: 0 0 35px rgba(114, 137, 218, 0.6);
+            margin: 0 auto 20px auto;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .avatar-img {
+            width: 70%;
+            height: 70%;
+            object-fit: contain;
+            border-radius: 0;
+        }
+
+        .avatar:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 45px rgba(114, 137, 218, 0.8);
+        }
+
+        /* المعلومات */
+        .info-section {
+            margin-bottom: 25px;
+        }
+
+        .username {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: var(--text-color);
+            text-shadow: 0 0 15px rgba(114, 137, 218, 0.9);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .username:hover {
+            text-shadow: 0 0 25px rgba(114, 137, 218, 1);
+            transform: scale(1.05);
+        }
+
+        .discord-tag {
+            color: var(--primary-color);
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .discord-tag:hover {
+            color: #8ba0ff;
+            text-shadow: 0 0 15px rgba(114, 137, 218, 0.7);
+            transform: scale(1.05);
+        }
+
+        .location {
+            color: var(--text-color);
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            opacity: 0.9;
+        }
+
+        .age {
+            color: var(--text-color);
+            font-size: 1em;
+            margin-bottom: 15px;
+            opacity: 0.8;
+        }
+
+        .bio {
+            color: var(--text-color);
+            font-size: 1em;
+            line-height: 1.5;
+            margin-bottom: 25px;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+            opacity: 0.8;
+        }
+
+        .bio-main {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        /* السوشال ميديا */
+        .social-section {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .social-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 1.2em;
+            color: var(--text-color);
+            text-decoration: none;
+            position: relative;
+        }
+
+        /* إزالة السهم من الروابط */
+        .social-icon::after {
+            display: none !important;
+        }
+
+        .social-icon:hover {
+            transform: scale(1.15) translateY(-5px);
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        /* ألوان الأيقونات */
+        .youtube { background: rgba(255, 0, 0, 0.3) !important; }
+        .instagram { background: rgba(225, 48, 108, 0.3) !important; }
+        .snapchat { background: rgba(255, 252, 0, 0.3) !important; }
+        .twitter { background: rgba(29, 161, 242, 0.3) !important; }
+        .tiktok { background: rgba(0, 0, 0, 0.3) !important; }
+        .discord { background: rgba(114, 137, 218, 0.3) !important; }
+        .spotify { background: rgba(30, 215, 96, 0.3) !important; }
+        .email { background: rgba(66, 133, 244, 0.3) !important; }
+        .fortnite-gg { background: rgba(255, 165, 0, 0.3) !important; }
+        .fortnite { background: rgba(148, 51, 255, 0.3) !important; }
+
+        /* أيقونة فورتنايت - حجم أصغر */
+        .fortnite img {
+            width: 50% !important;
+            height: 50% !important;
+            object-fit: contain;
+        }
+
+        /* تأثير مطر النجوم */
+        .star-rain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0;
+        }
+
+        .falling-star {
+            position: absolute;
+            background: linear-gradient(45deg, transparent, white, transparent);
+            width: 3px;
+            height: 20px;
+            border-radius: 50%;
+            animation: starFall 1s linear forwards;
+        }
+
+        /* زر التبديل */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--container-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--container-border);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px var(--shadow-color);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .theme-toggle i {
+            font-size: 1.2em;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        /* زر QR Code */
+        .qr-toggle {
+            position: fixed;
+            top: 85px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--container-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--container-border);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px var(--shadow-color);
+        }
+
+        .qr-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .qr-toggle i {
+            font-size: 1.2em;
+            color: var(--text-color);
+        }
+
+        /* QR Code Modal */
+        .qr-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .qr-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .qr-content {
+            background: var(--container-bg);
+            backdrop-filter: blur(20px);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            border: 1px solid var(--container-border);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            max-width: 90%;
+        }
+
+        .qr-code {
+            width: 200px;
+            height: 200px;
+            background: white;
+            margin: 15px auto;
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #333;
+            text-align: center;
+            word-break: break-all;
+        }
+
+        .url-display {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 12px;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #5a6fcf;
+            transform: scale(1.05);
+        }
+
+        /* عداد الزوار */
+        .visitor-counter {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: var(--container-bg);
+            backdrop-filter: blur(10px);
+            padding: 12px 20px;
+            border-radius: 25px;
+            border: 1px solid var(--container-border);
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 100;
+            box-shadow: 0 5px 15px var(--shadow-color);
+            animation: pulse 2s infinite;
+        }
+
+        .visitor-counter i {
+            color: #ff6b6b;
+        }
+
+        .visitor-count {
+            font-weight: bold;
+            color: #4ecdc4;
+            text-shadow: 0 0 10px rgba(78, 205, 196, 0.5);
+        }
+
+        /* Animations */
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes meteorFall {
+            0% { 
+                transform: translateX(-100px) translateY(-100px) rotate(45deg);
+                opacity: 1;
+                width: 0;
+            }
+            100% { 
+                transform: translateX(500px) translateY(500px) rotate(45deg);
+                opacity: 0;
+                width: 150px;
+            }
+        }
+
+        @keyframes cloudMove {
+            0% { transform: translateX(-200px); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateX(1500px); opacity: 0; }
+        }
+
+        @keyframes planetGlow {
+            0%, 100% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes starFall {
+            0% { 
+                transform: translateY(-100px) rotate(45deg);
+                opacity: 1;
+            }
+            100% { 
+                transform: translateY(100vh) rotate(45deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <!-- الخلفية الفلكية -->
+    <div class="stars" id="starsContainer"></div>
+    <div class="moon"></div>
+    <div class="sun"></div>
+    <div id="meteorsContainer"></div>
+    <div id="cloudsContainer"></div>
+    <div id="planetsContainer"></div>
+    
+    <!-- تأثير مطر النجوم -->
+    <div class="star-rain" id="starRain"></div>
+    
+    <!-- زر التبديل -->
+    <div class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon"></i>
+    </div>
+    
+    <!-- زر QR Code -->
+    <div class="qr-toggle" id="qrToggle">
+        <i class="fas fa-qrcode"></i>
+    </div>
+    
+    <!-- QR Code Modal -->
+    <div class="qr-modal" id="qrModal">
+        <div class="qr-content">
+            <h3>📱 مشاركة الموقع</h3>
+            <div class="qr-code">
+                <div>
+                    <div style="font-size: 16px; margin-bottom: 10px;">🔗 Kaster_02</div>
+                    <div style="font-size: 12px; color: #666;">مسح الكود</div>
+                </div>
+            </div>
+            <div class="url-display" id="currentUrl"></div>
+            <div>
+                <button class="copy-btn" onclick="copyUrl()">نسخ الرابط</button>
+                <button class="copy-btn" onclick="shareUrl()">مشاركة</button>
+                <button class="copy-btn" onclick="closeQR()">إغلاق</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- المربع الرئيسي -->
+    <div class="profile-container">
+        <!-- الصورة - دائرة الديسكورد -->
+        <div class="avatar-section">
+            <div class="avatar" onclick="openDiscord()">
+                <img src="https://cdn-icons-png.flaticon.com/512/5968/5968756.png" alt="Discord" class="avatar-img">
+            </div>
+        </div>
+        
+        <!-- المعلومات -->
+        <div class="info-section">
+            <div class="username" onclick="openDiscord()">Kaster_02</div>
+            <div class="discord-tag" onclick="openDiscord()">@Kaster_02</div>
+            <div class="location">🇸🇦 السعودية 📍</div>
+            <div class="age">العمر: 20 سنة</div>
+            <div class="bio">
+                <div class="bio-main">مطور و مصمم مواقع ✨</div>
+            </div>
+        </div>
+        
+        <!-- السوشال ميديا -->
+        <div class="social-section">
+            <a href="https://www.youtube.com/@kaster_02I" target="_blank" class="social-icon youtube" onclick="createStarRain(event)">
+                <i class="fab fa-youtube"></i>
+            </a>
+            <a href="https://www.instagram.com/kaster_02/" target="_blank" class="social-icon instagram" onclick="createStarRain(event)">
+                <i class="fab fa-instagram"></i>
+            </a>
+            <a href="https://www.snapchat.com/@kaster_02" target="_blank" class="social-icon snapchat" onclick="createStarRain(event)">
+                <i class="fab fa-snapchat"></i>
+            </a>
+            <a href="https://x.com/kaster_02" target="_blank" class="social-icon twitter" onclick="createStarRain(event)">
+                <i class="fab fa-twitter"></i>
+            </a>
+            <a href="https://www.tiktok.com/@kaster_02" target="_blank" class="social-icon tiktok" onclick="createStarRain(event)">
+                <i class="fab fa-tiktok"></i>
+            </a>
+            <a href="https://open.spotify.com/playlist/53SjuiCGYO52gdRffERzSq" target="_blank" class="social-icon spotify" onclick="createStarRain(event)">
+                <i class="fab fa-spotify"></i>
+            </a>
+            <a href="mailto:gogjdu887@gmail.com" class="social-icon email" onclick="createStarRain(event)">
+                <i class="fas fa-envelope"></i>
+            </a>
+            <a href="#" onclick="openDiscord(); createStarRain(event)" class="social-icon discord">
+                <i class="fab fa-discord"></i>
+            </a>
+            <!-- فورتنايت GG - وجه مبتسم -->
+            <a href="https://fortnite.gg/creator?name=tnv" target="_blank" class="social-icon fortnite-gg" onclick="createStarRain(event)">
+                <i class="fas fa-smile"></i>
+            </a>
+            <!-- فورتنايت - أيقونة الموقع الرسمي بحجم أصغر -->
+            <a href="https://www.fortnite.com/@tnv?lang=ar" target="_blank" class="social-icon fortnite" onclick="createStarRain(event)">
+                <img src="https://static-assets-prod.epicgames.com/fortnite/static/favicon.ico" alt="Fortnite">
+            </a>
+        </div>
+    </div>
+
+    <!-- عداد الزوار -->
+    <div class="visitor-counter">
+        <i class="fas fa-eye"></i>
+        <span class="visitor-count" id="visitorCount">1</span> زائر
+    </div>
+
+    <!-- نظام تتبع الزوار -->
+    <script src="https://cdn.counter.dev/script.js" data-id="kaster-02-profile" data-utcoffset="3"></script>
+    
+    <script>
+        // نظام Dark/Light Mode
+        function initTheme() {
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = themeToggle.querySelector('i');
+            const body = document.body;
+            
+            // التحقق من تفضيلات النظام
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (!prefersDark) {
+                body.setAttribute('data-theme', 'light');
+                themeIcon.className = 'fas fa-sun';
+            }
+            
+            // تبديل الوضع
+            themeToggle.addEventListener('click', () => {
+                const isDark = body.getAttribute('data-theme') === 'dark';
+                body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+                themeIcon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+                
+                // صوت التبديل
+                playToggleSound();
+            });
+        }
+
+        // تأثير مطر النجوم
+        function createStarRain(event) {
+            const starRain = document.getElementById('starRain');
+            const rect = event.currentTarget.getBoundingClientRect();
+            const x = rect.left + rect.width / 2;
+            
+            for (let i = 0; i < 15; i++) {
+                const star = document.createElement('div');
+                star.classList.add('falling-star');
+                star.style.left = (x + Math.random() * 100 - 50) + 'px';
+                star.style.animationDelay = (Math.random() * 0.5) + 's';
+                starRain.appendChild(star);
+                
+                setTimeout(() => {
+                    star.remove();
+                }, 1000);
+            }
+            
+            starRain.style.opacity = '1';
+            setTimeout(() => {
+                starRain.style.opacity = '0';
+            }, 1000);
+        }
+
+        // صوت التبديل
+        function playToggleSound() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.3);
+            
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+            
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 0.3);
+        }
+
+        // QR Code
+        function initQRCode() {
+            const qrToggle = document.getElementById('qrToggle');
+            const qrModal = document.getElementById('qrModal');
+            
+            qrToggle.addEventListener('click', () => {
+                qrModal.classList.add('active');
+                document.getElementById('currentUrl').textContent = window.location.href;
+            });
+        }
+
+        function closeQR() {
+            document.getElementById('qrModal').classList.remove('active');
+        }
+
+        function copyUrl() {
+            const url = window.location.href;
+            navigator.clipboard.writeText(url).then(() => {
+                alert('تم نسخ الرابط!');
+            });
+        }
+
+        function shareUrl() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Kaster_02 - النجم',
+                    url: window.location.href
+                });
+            } else {
+                copyUrl();
+            }
+        }
+
+        // حساب العمر تلقائي
+        function calculateAge() {
+            const birthDate = new Date(2005, 2, 26);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            return age;
+        }
+
+        function updateAge() {
+            const age = calculateAge();
+            document.querySelector('.age').textContent = `العمر: ${age} سنة`;
+        }
+
+        // إنشاء النجوم
+        function createStars() {
+            const starsContainer = document.getElementById('starsContainer');
+            const starCount = 300;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                const left = Math.random() * 100;
+                const top = Math.random() * 100;
+                const size = Math.random() * 3 + 1;
+                const delay = Math.random() * 5;
+                
+                star.style.left = left + '%';
+                star.style.top = top + '%';
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                star.style.animationDelay = delay + 's';
+                
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // إنشاء الشهب
+        function createMeteors() {
+            const meteorsContainer = document.getElementById('meteorsContainer');
+            const meteorCount = 8;
+            
+            for (let i = 0; i < meteorCount; i++) {
+                const meteor = document.createElement('div');
+                meteor.classList.add('meteor');
+                
+                const top = Math.random() * 50;
+                const delay = Math.random() * 15;
+                const duration = Math.random() * 3 + 2;
+                
+                meteor.style.top = top + '%';
+                meteor.style.animationDelay = delay + 's';
+                meteor.style.animationDuration = duration + 's';
+                
+                meteorsContainer.appendChild(meteor);
+            }
+        }
+
+        // إنشاء الغيوم الجديدة
+        function createClouds() {
+            const cloudsContainer = document.getElementById('cloudsContainer');
+            const cloudCount = 8;
+            
+            for (let i = 0; i < cloudCount; i++) {
+                const cloud = document.createElement('div');
+                cloud.classList.add('cloud');
+                
+                // أنواع مختلفة من الغيوم
+                const cloudType = `cloud-${Math.floor(Math.random() * 3) + 1}`;
+                cloud.classList.add(cloudType);
+                
+                const top = Math.random() * 60 + 10;
+                const delay = Math.random() * 30;
+                const duration = Math.random() * 40 + 30;
+                
+                cloud.style.top = top + '%';
+                cloud.style.animation = `cloudMove ${duration}s linear ${delay}s infinite`;
+                
+                cloudsContainer.appendChild(cloud);
+            }
+        }
+
+        // إنشاء الكواكب
+        function createPlanets() {
+            const planetsContainer = document.getElementById('planetsContainer');
+            const planetColors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3'];
+            
+            for (let i = 0; i < 6; i++) {
+                const planet = document.createElement('div');
+                planet.classList.add('planet');
+                
+                const left = Math.random() * 80 + 10;
+                const top = Math.random() * 60 + 20;
+                const size = Math.random() * 35 + 25;
+                const color = planetColors[i];
+                const delay = Math.random() * 3;
+                
+                planet.style.left = left + '%';
+                planet.style.top = top + '%';
+                planet.style.width = size + 'px';
+                planet.style.height = size + 'px';
+                planet.style.background = color;
+                planet.style.animationDelay = delay + 's';
+                planet.style.boxShadow = `0 0 30px ${color}`;
+                
+                planetsContainer.appendChild(planet);
+            }
+        }
+
+        // فتح الديسكورد
+        function openDiscord() {
+            window.open('https://discord.com/users/860948173827997719', '_blank');
+        }
+
+        // تحديث عداد الزوار
+        function updateVisitorCount() {
+            let count = localStorage.getItem('kasterVisitors');
+            if (!count) {
+                count = 1;
+            } else {
+                count = parseInt(count) + 1;
+            }
+            localStorage.setItem('kasterVisitors', count);
+            document.getElementById('visitorCount').textContent = count;
+        }
+
+        // تشغيل كل شيء عند تحميل الصفحة
+        window.onload = function() {
+            initTheme();
+            initQRCode();
+            createStars();
+            createMeteors();
+            createClouds();
+            createPlanets();
+            updateAge();
+            updateVisitorCount();
+        };
+    </script>
+</body>
+</html>
